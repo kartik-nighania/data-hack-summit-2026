@@ -16,7 +16,7 @@ behind an MCP server (FastMCP, stdio) that the agent discovers at deploy time.
 | --- | --- |
 | `workshop/00…05_*.ipynb` | The six module notebooks (00: M0–2 · 01: M3 · 02: M4–5 · 03: M6 · 04: M7–8 · 05: M9–11). Generated from the monolith; every notebook starts with the same 4 bootstrap cells |
 | `workshop/agentOps_workshop.ipynb` | The original 91-cell monolith — kept as the teaching-content reference until the split notebooks are battle-tested |
-| `app/config.py` | config.yaml constants + `load_keys()` (Kaggle → Colab → .env → getpass) + `get_lf()` (client with masking hook). **No network at import anywhere in app/** |
+| `app/config.py` | config.yaml constants + `load_keys()` (Colab Secrets → .env → getpass) + `get_lf()` (client with masking hook). **No network at import anywhere in app/** |
 | `app/pii_data_masking.py` | `PII_PATTERNS` list + export-time masking hook; empty list = no-op |
 | `app/mcp.py` | Mock world (loads `data/*.json`) + the service-desk MCP server. Run as `python -m app.mcp` — never `python app/mcp.py` (would shadow the real `mcp` package) |
 | `app/tools.py` | Account/policy tools, TF-IDF retriever, `FLAKY_MODE` retry demo (Module 4) |

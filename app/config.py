@@ -50,36 +50,22 @@ REQUIRED_KEYS = ["OPENAI_API_KEY", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY"]
 
 
 def load_keys():
-    """Load API keys for notebooks: Kaggle Secrets → Colab Secrets → env vars / .env → manual prompt."""
+    """Load API keys for notebooks: Colab Secrets → env vars / .env → manual prompt."""
     source = "environment variables"
     try:
-        from kaggle_secrets import UserSecretsClient
-        client = UserSecretsClient()
-        source = "Kaggle Secrets"
+        from google.colab import userdata  # type: ignore
+        source = "Colab Secrets"
         for name in REQUIRED_KEYS + ["LANGFUSE_HOST"]:
             try:
-                os.environ[name] = client.get_secret(name)
+                os.environ[name] = userdata.get(name)
             except Exception:
                 if name in REQUIRED_KEYS and not os.environ.get(name):
                     raise RuntimeError(
-                        f"Secret '{name}' is not attached to THIS notebook.\n"
-                        "Fix: Add-ons ▸ Secrets → tick the checkbox next to it → Done → re-run this cell."
+                        f"Secret '{name}' is not available to THIS notebook.\n"
+                        "Fix: 🔑 Secrets (left sidebar) → add the secret → enable 'Notebook access' → re-run."
                     )
     except ImportError:
-        try:
-            from google.colab import userdata  # type: ignore
-            source = "Colab Secrets"
-            for name in REQUIRED_KEYS + ["LANGFUSE_HOST"]:
-                try:
-                    os.environ[name] = userdata.get(name)
-                except Exception:
-                    if name in REQUIRED_KEYS and not os.environ.get(name):
-                        raise RuntimeError(
-                            f"Secret '{name}' is not available to THIS notebook.\n"
-                            "Fix: 🔑 (left sidebar) → add the secret → enable 'Notebook access' → re-run."
-                        )
-        except ImportError:
-            pass  # not on Kaggle/Colab — fall through to env vars / .env / manual input
+        pass  # not on Colab — fall through to env vars / .env / manual input
 
     load_env()   # .env fills anything still missing; host gets normalized
     for name in REQUIRED_KEYS:

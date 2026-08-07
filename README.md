@@ -14,7 +14,7 @@ at deploy time.
 
 | Path | What |
 | --- | --- |
-| `workshop/00…05_*.ipynb` | **The six module notebooks** (see map below) — each bootstraps itself, so a fresh Colab/Kaggle session resumes in minutes |
+| `workshop/00…05_*.ipynb` | **The six module notebooks** (see map below) — each bootstraps itself, so a fresh Colab session resumes in minutes |
 | `workshop/agentOps_workshop.ipynb` | The original single-notebook version (kept as reference until the split is battle-tested) |
 | `app/` | The reusable package the notebooks import (see module table) |
 | `data/database.json` | Mock world: customers, loans, tickets |
@@ -30,7 +30,7 @@ at deploy time.
 
 | Module | Holds |
 | --- | --- |
-| `config.py` | config.yaml constants, key loading (Kaggle → Colab → .env → prompt), the Langfuse client |
+| `config.py` | config.yaml constants, key loading (Colab Secrets → .env → prompt), the Langfuse client |
 | `pii_data_masking.py` | `PII_PATTERNS` + the export-time masking hook (Module 2.9) |
 | `mcp.py` | The mock world (loads `data/*.json`) **and** the service-desk MCP server (`python -m app.mcp`) |
 | `tools.py` | Account/policy tools + TF-IDF retriever + the Module-4 FLAKY_MODE retry demo |
@@ -50,14 +50,14 @@ deepeval 4.1.1 · fastmcp 3.4.6 · langchain-mcp-adapters 0.3.2) · agent `gpt-4
 
 ## Notebook map (4 h total)
 
-| Notebook | Modules | ~min | What happens |
-| --- | --- | --- | --- |
-| `00_setup_and_agent` | 0–2 | 45 | keys & connection check; the mock world, tools (service desk via MCP), prompts v1, the graph; first traces; PII masking |
-| `01_prompt_versioning` | 3 | 15 | labels, staging → promote → rollback, fallbacks |
-| `02_tracing_and_feedback` | 4–5 | 40 | trace anatomy, sessions, timeout/retry demo, tags; user feedback as scores |
-| `03_evaluation` | 6 | 80 | golden dataset (pinned), baseline run, rule evaluators, hand-built judges + bias checks, DeepEval, managed evaluator, annotation, ship v2 & prove it |
-| `04_production_online_eval` | 7–8 | 30 | simulated production traffic, online scoring (trace/observation/session level), promote failures, dashboards & Metrics API |
-| `05_incident_alerting_ci` | 9–11 | 45 | baseline → v3 incident → alert → rollback; the CI gate live; wrap-up |
+| Notebook | Modules | ~min | What happens | Open |
+| --- | --- | --- | --- | --- |
+| `00_setup_and_agent` | 0–2 | 45 | keys & connection check; the mock world, tools (service desk via MCP), prompts v1, the graph; first traces; PII masking | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/00_setup_and_agent.ipynb) |
+| `01_prompt_versioning` | 3 | 15 | labels, staging → promote → rollback, fallbacks | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/01_prompt_versioning.ipynb) |
+| `02_tracing_and_feedback` | 4–5 | 40 | trace anatomy, sessions, timeout/retry demo, tags; user feedback as scores | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/02_tracing_and_feedback.ipynb) |
+| `03_evaluation` | 6 | 80 | golden dataset (frozen), baseline run, rule evaluators, hand-built judges + bias checks, DeepEval, managed evaluator, annotation, ship v2 & prove it | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/03_evaluation.ipynb) |
+| `04_production_online_eval` | 7–8 | 30 | simulated production traffic, online scoring (trace/observation/session level), promote failures, dashboards & Metrics API | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/04_production_online_eval.ipynb) |
+| `05_incident_alerting_ci` | 9–11 | 45 | baseline → v3 incident → alert → rollback; the CI gate live; wrap-up | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/05_incident_alerting_ci.ipynb) |
 
 Each notebook starts with the same four bootstrap cells (clone+install → env → keys → client).
 Run them top-to-bottom; there is no local state — the cross-notebook anchors are fixed names in
@@ -67,8 +67,10 @@ Langfuse itself (the frozen `meridian-golden-v1` dataset, the `v2` prompt label 
 
 1. Get an [OpenAI API key](https://platform.openai.com/api-keys) and a free
    [Langfuse Cloud](https://cloud.langfuse.com) project (public + secret key).
-2. **Colab/Kaggle**: add `OPENAI_API_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`,
-   `LANGFUSE_HOST` as notebook secrets, open `workshop/00_setup_and_agent.ipynb`, run all.
+2. **Colab** (recommended): open the 🔑 **Secrets** panel (left sidebar), add
+   `OPENAI_API_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY` (+ optionally
+   `LANGFUSE_HOST`) and enable **Notebook access** for each; then hit the notebook's
+   Colab badge above and run top to bottom.
    **Local**: put the same keys in `.env`, `pip install -r requirements.txt`, open the notebook.
 3. Run notebooks in order — 03 must run before 04/05 (it seeds the dataset and ships v2).
 
