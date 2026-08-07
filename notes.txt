@@ -1,0 +1,8 @@
+annotation queue work 
+
+container - sample ur slide
+scaling - ur slides (make sure to also mention, checkpointing, persistence, time-travel and stateless, also add your AV slides)
+security - container and auth ur slides
+
+MCP slides
+small module on MCP

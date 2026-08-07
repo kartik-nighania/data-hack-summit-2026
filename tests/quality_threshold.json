@@ -1,0 +1,8 @@
+{
+  "min_items_completed": 22,
+  "thresholds": {
+    "avg_completeness": 0.70,
+    "avg_business_rules_ok": 0.90,
+    "avg_route_correct": 0.80
+  }
+}
