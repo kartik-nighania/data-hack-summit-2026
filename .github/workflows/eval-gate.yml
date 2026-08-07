@@ -21,7 +21,7 @@ jobs:
             - name: Install app dependencies
               run: pip install -r requirements.txt
 
-            - uses: langfuse/experiment-action@v1
+            - uses: langfuse/experiment-action@v1.0.8
               env:
                   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
               with:
