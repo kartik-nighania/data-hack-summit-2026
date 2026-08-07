@@ -26,7 +26,7 @@ from pydantic import BaseModel, Field
 from app.config import AGENT_MODEL, REPO_ROOT, get_lf, trace_url
 from app.prompts import FINAL_V1, POLICY_V1, SUPERVISOR_V1
 
-SABOTAGE_BREVITY = False   # ← the PR under review flips this to True
+SABOTAGE_BREVITY = True   # ← the PR under review flips this to True
 
 
 def set_sabotage(on: bool):
