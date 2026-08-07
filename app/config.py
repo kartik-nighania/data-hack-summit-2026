@@ -50,13 +50,15 @@ REQUIRED_KEYS = ["OPENAI_API_KEY", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY"]
 
 
 def load_keys():
-    """Load API keys: .env at the repo root (copy .env.example and fill it in) → env vars → manual prompt."""
-    load_env()   # reads .env; real env vars win; host gets normalized, quotes stripped
-    source = ".env / environment"
+    """Validate API keys: the notebook paste-cell / env vars → .env at the repo root → manual prompt."""
+    for k in REQUIRED_KEYS:
+        if "..." in os.environ.get(k, ""):
+            del os.environ[k]                 # unedited "sk-proj-..." placeholders don't count
+    load_env()   # .env fills anything missing; host gets normalized, quotes stripped
+    source = "environment / .env"
     missing = [k for k in REQUIRED_KEYS if not os.environ.get(k)]
     if missing:
-        print(f"⚠️  missing {missing}")
-        print("   Fix: copy .env.example to .env at the repo root and paste your keys — or enter them now:")
+        print(f"⚠️  missing {missing} — paste them into the keys cell above (or .env), or enter now:")
         from getpass import getpass
         for name in missing:
             os.environ[name] = getpass(f"Paste {name}: ").strip()
