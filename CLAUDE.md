@@ -16,7 +16,7 @@ behind an MCP server (FastMCP, stdio) that the agent discovers at deploy time.
 | --- | --- |
 | `workshop/00…05_*.ipynb` | The six module notebooks (00: M0–2 · 01: M3 · 02: M4–5 · 03: M6 · 04: M7–8 · 05: M9–11). Generated from the monolith; every notebook starts with the same 4 bootstrap cells |
 | `workshop/agentOps_workshop.ipynb` | The original 91-cell monolith — kept as the teaching-content reference until the split notebooks are battle-tested |
-| `app/config.py` | config.yaml constants + `load_keys()` (Colab Secrets → .env → getpass) + `get_lf()` (client with masking hook). **No network at import anywhere in app/** |
+| `app/config.py` | config.yaml constants + `load_keys()` (.env at repo root → env vars → getpass) + `get_lf()` (client with masking hook). **No network at import anywhere in app/** |
 | `app/pii_data_masking.py` | `PII_PATTERNS` list + export-time masking hook; empty list = no-op |
 | `app/mcp.py` | Mock world (loads `data/*.json`) + the service-desk MCP server. Run as `python -m app.mcp` — never `python app/mcp.py` (would shadow the real `mcp` package) |
 | `app/tools.py` | Account/policy tools, TF-IDF retriever, `FLAKY_MODE` retry demo (Module 4) |
@@ -51,8 +51,9 @@ behind an MCP server (FastMCP, stdio) that the agent discovers at deploy time.
   into `meridian-golden-candidates`), and notebook 05's rollback target is the `v2` prompt
   **label** notebook 03 stamps on `final-response`. Never add a version-pin or state file back.
 - Env vars: `OPENAI_API_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`,
-  `LANGFUSE_HOST`/`LANGFUSE_BASE_URL` (config sets both). Local keys in `.env`
-  (git-ignored — never commit or print). CI: GitHub secrets + `LANGFUSE_HOST` variable.
+  `LANGFUSE_HOST`/`LANGFUSE_BASE_URL` (config sets both). Keys live in `.env` at the repo
+  root (copied from `.env.example`; git-ignored — never commit or print). Trainees create it
+  on Colab right after cloning. CI: GitHub secrets + `LANGFUSE_HOST` variable.
 - The monolith notebook stores cell `source` as single strings (not line lists); the six
   generated notebooks use plain strings too — account for that when editing programmatically.
 - The notebooks are regenerable: the builder script lives in the session scratchpad

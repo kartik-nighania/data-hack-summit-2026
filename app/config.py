@@ -50,29 +50,17 @@ REQUIRED_KEYS = ["OPENAI_API_KEY", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY"]
 
 
 def load_keys():
-    """Load API keys for notebooks: Colab Secrets → env vars / .env → manual prompt."""
-    source = "environment variables"
-    try:
-        from google.colab import userdata  # type: ignore
-        source = "Colab Secrets"
-        for name in REQUIRED_KEYS + ["LANGFUSE_HOST"]:
-            try:
-                os.environ[name] = userdata.get(name)
-            except Exception:
-                if name in REQUIRED_KEYS and not os.environ.get(name):
-                    raise RuntimeError(
-                        f"Secret '{name}' is not available to THIS notebook.\n"
-                        "Fix: 🔑 Secrets (left sidebar) → add the secret → enable 'Notebook access' → re-run."
-                    )
-    except ImportError:
-        pass  # not on Colab — fall through to env vars / .env / manual input
-
-    load_env()   # .env fills anything still missing; host gets normalized
-    for name in REQUIRED_KEYS:
-        if not os.environ.get(name):
-            from getpass import getpass
+    """Load API keys: .env at the repo root (copy .env.example and fill it in) → env vars → manual prompt."""
+    load_env()   # reads .env; real env vars win; host gets normalized, quotes stripped
+    source = ".env / environment"
+    missing = [k for k in REQUIRED_KEYS if not os.environ.get(k)]
+    if missing:
+        print(f"⚠️  missing {missing}")
+        print("   Fix: copy .env.example to .env at the repo root and paste your keys — or enter them now:")
+        from getpass import getpass
+        for name in missing:
             os.environ[name] = getpass(f"Paste {name}: ").strip()
-            source = "manual input"
+        source = "manual input"
     print(f"✅ keys loaded from {source} | Langfuse host: {os.environ['LANGFUSE_HOST']}")
 
 

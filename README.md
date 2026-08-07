@@ -24,13 +24,13 @@ at deploy time.
 | `tests/quality_threshold.json` | The gate's pass/fail bar — tune here, no code change |
 | `.github/workflows/eval-gate.yml` | Runs the gate on every PR via `langfuse/experiment-action` |
 | `config.yaml` | Workshop constants (models, dataset names, concurrency) — no secrets |
-| `.env` *(git-ignored)* | Your `OPENAI_API_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL` |
+| `.env.example` | Template for your keys — copy to `.env` (git-ignored) next to `requirements.txt` and fill in |
 
 ### The `app/` package
 
 | Module | Holds |
 | --- | --- |
-| `config.py` | config.yaml constants, key loading (Colab Secrets → .env → prompt), the Langfuse client |
+| `config.py` | config.yaml constants, key loading (.env at repo root → env vars → prompt), the Langfuse client |
 | `pii_data_masking.py` | `PII_PATTERNS` + the export-time masking hook (Module 2.9) |
 | `mcp.py` | The mock world (loads `data/*.json`) **and** the service-desk MCP server (`python -m app.mcp`) |
 | `tools.py` | Account/policy tools + TF-IDF retriever + the Module-4 FLAKY_MODE retry demo |
@@ -67,11 +67,12 @@ Langfuse itself (the frozen `meridian-golden-v1` dataset, the `v2` prompt label 
 
 1. Get an [OpenAI API key](https://platform.openai.com/api-keys) and a free
    [Langfuse Cloud](https://cloud.langfuse.com) project (public + secret key).
-2. **Colab** (recommended): open the 🔑 **Secrets** panel (left sidebar), add
-   `OPENAI_API_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY` (+ optionally
-   `LANGFUSE_HOST`) and enable **Notebook access** for each; then hit the notebook's
-   Colab badge above and run top to bottom.
-   **Local**: put the same keys in `.env`, `pip install -r requirements.txt`, open the notebook.
+2. **Colab** (recommended): hit the notebook's Colab badge above and run the clone cell;
+   then in the **📁 Files** panel copy `.env.example` to **`.env`** (same folder as
+   `requirements.txt`), paste your keys in, save, and keep running top to bottom.
+   Coming back after a session reset: re-run the clone cell and drop your saved `.env`
+   back in — nothing else to redo.
+   **Local**: same `.env` at the repo root, `pip install -r requirements.txt`, open the notebook.
 3. Run notebooks in order — 03 must run before 04/05 (it seeds the dataset and ships v2).
 
 # Module 10 — the CI/CD quality gate
