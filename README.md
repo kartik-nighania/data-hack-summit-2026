@@ -10,37 +10,37 @@ between account, policy, and service specialists over a mock loan-servicing worl
 
 ## Repo layout
 
-| Path | What |
-| --- | --- |
-| `workshop/00…05_*.ipynb` | **The six module notebooks** (see map below) — each bootstraps itself, so a fresh Colab session resumes in minutes |
-| `workshop/agentOps_workshop.ipynb` | The original single-notebook version (kept as reference until the split is battle-tested) |
-| `app/` | The reusable package the notebooks import (see module table) |
-| `data/database.json` | Mock world: customers, loans, tickets |
-| `data/knowledge_base.json` | The 12 policy clauses the TF-IDF retriever searches |
-| `data/golden_items.json` | The 22 golden test items (5 categories) |
-| `tests/run_evals.py` | Module-10 quality gate: `experiment(context)` for CI + a local CLI |
-| `tests/quality_threshold.json` | The gate's pass/fail bar — tune here, no code change |
-| `.github/workflows/eval-gate.yml` | Runs the gate on every PR via `langfuse/experiment-action` |
-| `config.yaml` | Workshop constants (models, dataset names, concurrency) — no secrets |
-| `.env.example` | Key template for local runs — copy to `.env` (git-ignored) at the repo root (Colab users paste keys in the notebook instead) |
+| Path                               | What                                                                                                                         |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `workshop/00…05_*.ipynb`           | **The six module notebooks** (see map below) — each bootstraps itself, so a fresh Colab session resumes in minutes           |
+| `workshop/agentOps_workshop.ipynb` | The original single-notebook version (kept as reference until the split is battle-tested)                                    |
+| `app/`                             | The reusable package the notebooks import (see module table)                                                                 |
+| `data/database.json`               | Mock world: customers, loans, tickets                                                                                        |
+| `data/knowledge_base.json`         | The 12 policy clauses the TF-IDF retriever searches                                                                          |
+| `data/golden_items.json`           | The 22 golden test items (5 categories)                                                                                      |
+| `tests/run_evals.py`               | Module-10 quality gate: `experiment(context)` for CI + a local CLI                                                           |
+| `tests/quality_threshold.json`     | The gate's pass/fail bar — tune here, no code change                                                                         |
+| `.github/workflows/eval-gate.yml`  | Runs the gate on every PR via `langfuse/experiment-action`                                                                   |
+| `config.yaml`                      | Workshop constants (models, dataset names, concurrency) — no secrets                                                         |
+| `.env.example`                     | Key template for local runs — copy to `.env` (git-ignored) at the repo root (Colab users paste keys in the notebook instead) |
 
 ### The `app/` package
 
-| Module | Holds |
-| --- | --- |
-| `config.py` | config.yaml constants, key loading (paste-cell/env vars → .env → prompt), the Langfuse client |
-| `pii_data_masking.py` | `PII_PATTERNS` + the export-time masking hook (Module 2.9) |
-| `db.py` | The mock world: customers, loans, tickets + the policy KB (loads `data/*.json`) |
-| `tools.py` | All agent tools (account, policy retriever, service desk) + the Module-4 FLAKY_MODE retry demo |
-| `agent.py` | The LangGraph graph, `deploy_agent()`/`run_agent()`/`ainvoke_agent()`, `SABOTAGE_BREVITY` |
-| `prompts.py` | The three v1 prompts + idempotent `ensure_prompt()`/`seed_prompts()` |
-| `golden.py` | Golden items + idempotent `seed_dataset()` + the candidates dataset for promoted failures |
-| `evaluators.py` | The five rule evaluators + run-level rollups (shared with the CI gate) |
-| `feedback.py` | Score configs + `record_feedback()` (Module 5) |
-| `judges.py` | Judge cost tracking + DeepEval bridge helpers |
-| `online_eval.py` | `score_recent_production()` — the scheduled online-eval job (Module 7) |
-| `get_dashboard_metrics.py` | `metrics_query()` — resilient Metrics-API access (Module 8/9) |
-| `generate_fake_traffic.py` | Simulated production traffic (also `python -m app.generate_fake_traffic`) |
+| Module                     | Holds                                                                                          |
+| -------------------------- | ---------------------------------------------------------------------------------------------- |
+| `config.py`                | config.yaml constants, key loading (paste-cell/env vars → .env → prompt), the Langfuse client  |
+| `pii_data_masking.py`      | `PII_PATTERNS` + the export-time masking hook (Module 2.9)                                     |
+| `db.py`                    | The mock world: customers, loans, tickets + the policy KB (loads `data/*.json`)                |
+| `tools.py`                 | All agent tools (account, policy retriever, service desk) + the Module-4 FLAKY_MODE retry demo |
+| `agent.py`                 | The LangGraph graph, `deploy_agent()`/`run_agent()`/`ainvoke_agent()`, `SABOTAGE_BREVITY`      |
+| `prompts.py`               | The three v1 prompts + idempotent `ensure_prompt()`/`seed_prompts()`                           |
+| `golden.py`                | Golden items + idempotent `seed_dataset()` + the candidates dataset for promoted failures      |
+| `evaluators.py`            | The five rule evaluators + run-level rollups (shared with the CI gate)                         |
+| `feedback.py`              | Score configs + `record_feedback()` (Module 5)                                                 |
+| `judges.py`                | Judge cost tracking + DeepEval bridge helpers                                                  |
+| `online_eval.py`           | `score_recent_production()` — the scheduled online-eval job (Module 7)                         |
+| `get_dashboard_metrics.py` | `metrics_query()` — resilient Metrics-API access (Module 8/9)                                  |
+| `generate_fake_traffic.py` | Simulated production traffic (also `python -m app.generate_fake_traffic`)                      |
 
 Pinned stack: see `requirements.txt` (langfuse 4.14.1 · langchain 1.3.14 · langgraph 1.2.9 ·
 deepeval 4.1.1) · agent `gpt-4o-mini` · judges
@@ -48,14 +48,14 @@ deepeval 4.1.1) · agent `gpt-4o-mini` · judges
 
 ## Notebook map (4 h total)
 
-| Notebook | Modules | ~min | What happens | Open |
-| --- | --- | --- | --- | --- |
-| `00_setup_and_agent` | 0–2 | 45 | keys & connection check; the mock world, the specialists' tools, prompts v1, the graph; first traces; PII masking | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/00_setup_and_agent.ipynb) |
-| `01_prompt_versioning` | 3 | 15 | labels, staging → promote → rollback, fallbacks | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/01_prompt_versioning.ipynb) |
-| `02_tracing_and_feedback` | 4–5 | 40 | trace anatomy, sessions, timeout/retry demo, tags; user feedback as scores | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/02_tracing_and_feedback.ipynb) |
-| `03_evaluation` | 6 | 80 | golden dataset (frozen), baseline run, rule evaluators, hand-built judges + bias checks, DeepEval, managed evaluator, annotation, ship v2 & prove it | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/03_evaluation.ipynb) |
-| `04_production_online_eval` | 7–8 | 30 | simulated production traffic, online scoring (trace/observation/session level), promote failures, dashboards & Metrics API | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/04_production_online_eval.ipynb) |
-| `05_incident_alerting_ci` | 9–11 | 45 | baseline → v3 incident → alert → rollback; the CI gate live; wrap-up | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/05_incident_alerting_ci.ipynb) |
+| Notebook                    | Modules | ~min | What happens                                                                                                                                         | Open                                                                                                                                                                                                            |
+| --------------------------- | ------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `00_setup_and_agent`        | 0–2     | 45   | keys & connection check; the mock world, the specialists' tools, prompts v1, the graph; first traces; PII masking                                    | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/00_setup_and_agent.ipynb)        |
+| `01_prompt_versioning`      | 3       | 15   | labels, staging → promote → rollback, fallbacks                                                                                                      | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/01_prompt_versioning.ipynb)      |
+| `02_tracing_and_feedback`   | 4–5     | 40   | trace anatomy, sessions, timeout/retry demo, tags; user feedback as scores                                                                           | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/02_tracing_and_feedback.ipynb)   |
+| `03_evaluation`             | 6       | 80   | golden dataset (frozen), baseline run, rule evaluators, hand-built judges + bias checks, DeepEval, managed evaluator, annotation, ship v2 & prove it | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/03_evaluation.ipynb)             |
+| `04_production_online_eval` | 7–8     | 30   | simulated production traffic, online scoring (trace/observation/session level), promote failures, dashboards & Metrics API                           | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/04_production_online_eval.ipynb) |
+| `05_incident_alerting_ci`   | 9–11    | 45   | baseline → v3 incident → alert → rollback; the CI gate live; wrap-up                                                                                 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kartik-nighania/data-hack-summit-2026/blob/main/workshop/05_incident_alerting_ci.ipynb)   |
 
 Each notebook starts with the same four bootstrap cells (clone+install → env → keys → client).
 Run them top-to-bottom; there is no local state — the cross-notebook anchors are fixed names in
