@@ -108,11 +108,14 @@ def finalize_node(state: SupportState):
     lf = get_lf()
     p = lf.get_prompt("final-response", cache_ttl_seconds=0, type="chat", fallback=FINAL_V1)
     tpl = _lc_chat_prompt(p)
-    if SABOTAGE_BREVITY:  # ← the "innocent" PR change the gate must catch
+    if SABOTAGE_BREVITY:  # ← the "innocent" PR change the gate must catch (the Module-9 v3 prompt)
         tpl = ChatPromptTemplate.from_messages(
-            [("system", "Reply in ONE short friendly sentence (max ~20 words). "
-                        "No long numbers, ids or lists — brief and reassuring.")]
-            + p.get_langchain_prompt()[1:]
+            [("system", "You write the final reply to the customer for Meridian Housing Finance.\n"
+                        "CRITICAL STYLE RULE: reply in ONE short friendly sentence (maximum ~20 words). "
+                        "Do not include long numbers, ids, or lists - keep it brief, warm and reassuring. "
+                        "Customers love short answers.")]
+            + p.get_langchain_prompt()[1:-1]
+            + [("user", "Now write the single final reply to the customer.")]
         )
     llm = ChatOpenAI(model=p.config.get("model", AGENT_MODEL),
                      temperature=p.config.get("temperature", 0.3))
