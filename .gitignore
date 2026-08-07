@@ -1,0 +1,9 @@
+venv/**
+.venv/**
+.env
+docs/
+.DS_Store
+__pycache__/
+baseline.json
+workshop/baseline.json
+assets/

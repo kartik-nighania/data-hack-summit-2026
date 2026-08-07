@@ -1,0 +1,155 @@
+{
+  "CUSTOMERS": {
+    "CUST-1001": {
+      "name": "Ananya Sharma",
+      "phone": "+91-9820011223",
+      "email": "ananya.sharma@example.com",
+      "pan": "ABCPS1234F",
+      "loans": [
+        "LN-5001"
+      ]
+    },
+    "CUST-1002": {
+      "name": "Rohit Verma",
+      "phone": "+91-9987044556",
+      "email": "rohit.verma@example.com",
+      "pan": "AGHPV9876K",
+      "loans": [
+        "LN-5002"
+      ]
+    },
+    "CUST-1003": {
+      "name": "Priya Nair",
+      "phone": "+91-9811077889",
+      "email": "priya.nair@example.com",
+      "pan": "BKJPN4567L",
+      "loans": [
+        "LN-5003",
+        "LN-5004"
+      ]
+    },
+    "CUST-1004": {
+      "name": "Imran Qureshi",
+      "phone": "+91-9930166778",
+      "email": "imran.q@example.com",
+      "pan": "AKLPQ2211M",
+      "loans": [
+        "LN-5005"
+      ]
+    },
+    "CUST-1005": {
+      "name": "Sneha Kulkarni",
+      "phone": "+91-9822233445",
+      "email": "sneha.k@example.com",
+      "pan": "BQRPK8890T",
+      "loans": [
+        "LN-5006"
+      ]
+    },
+    "CUST-1006": {
+      "name": "Devang Patel",
+      "phone": "+91-9877700112",
+      "email": "devang.p@example.com",
+      "pan": "AXYPP3345Q",
+      "loans": [
+        "LN-5007"
+      ]
+    }
+  },
+  "LOANS": {
+    "LN-5001": {
+      "customer_id": "CUST-1001",
+      "type": "home_loan",
+      "principal": 4500000,
+      "outstanding": 3812450,
+      "rate_pct": 8.85,
+      "rate_type": "floating",
+      "emi": 40350,
+      "due_day": 5,
+      "months_left": 152,
+      "status": "active"
+    },
+    "LN-5002": {
+      "customer_id": "CUST-1002",
+      "type": "home_loan",
+      "principal": 2800000,
+      "outstanding": 2610300,
+      "rate_pct": 9.1,
+      "rate_type": "fixed",
+      "emi": 25480,
+      "due_day": 10,
+      "months_left": 210,
+      "status": "active"
+    },
+    "LN-5003": {
+      "customer_id": "CUST-1003",
+      "type": "home_loan",
+      "principal": 6200000,
+      "outstanding": 5905120,
+      "rate_pct": 8.7,
+      "rate_type": "floating",
+      "emi": 54760,
+      "due_day": 7,
+      "months_left": 224,
+      "status": "active"
+    },
+    "LN-5004": {
+      "customer_id": "CUST-1003",
+      "type": "top_up",
+      "principal": 800000,
+      "outstanding": 742900,
+      "rate_pct": 9.6,
+      "rate_type": "floating",
+      "emi": 16920,
+      "due_day": 7,
+      "months_left": 54,
+      "status": "active"
+    },
+    "LN-5005": {
+      "customer_id": "CUST-1004",
+      "type": "home_loan",
+      "principal": 3500000,
+      "outstanding": 1204800,
+      "rate_pct": 8.95,
+      "rate_type": "floating",
+      "emi": 33540,
+      "due_day": 3,
+      "months_left": 41,
+      "status": "active"
+    },
+    "LN-5006": {
+      "customer_id": "CUST-1005",
+      "type": "home_loan",
+      "principal": 5000000,
+      "outstanding": 4890770,
+      "rate_pct": 9.05,
+      "rate_type": "fixed",
+      "emi": 45020,
+      "due_day": 15,
+      "months_left": 228,
+      "status": "active"
+    },
+    "LN-5007": {
+      "customer_id": "CUST-1006",
+      "type": "home_loan",
+      "principal": 2000000,
+      "outstanding": 0,
+      "rate_pct": 9.4,
+      "rate_type": "fixed",
+      "emi": 0,
+      "due_day": 1,
+      "months_left": 0,
+      "status": "closed_2019"
+    }
+  },
+  "TICKETS": {
+    "TKT-2026-0042": {
+      "customer_id": "CUST-1005",
+      "category": "complaint",
+      "description": "Charged late fee despite paying on time",
+      "status": "in_progress",
+      "created": "2026-07-12",
+      "owner": "L1-support"
+    }
+  }
+}

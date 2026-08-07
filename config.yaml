@@ -1,0 +1,9 @@
+# Workshop constants — no secrets here (keys live in .env locally, GitHub secrets in CI).
+agent_model: gpt-4o-mini
+judge_model: gpt-4.1-mini
+langfuse_host: https://us.cloud.langfuse.com   # fallback only — LANGFUSE_HOST/.env wins
+dataset_name: meridian-golden-v1                  # FROZEN gate set — never written after seeding
+candidates_dataset_name: meridian-golden-candidates   # where Module 7.5 promotes prod failures
+experiment_concurrency: 4
+ingestion_wait_s: 25        # Langfuse needs ~15–30s before new data is queryable
+traffic_sessions: 24        # default for generate_fake_traffic (override with --sessions)
