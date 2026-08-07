@@ -1,0 +1,40 @@
+name: Langfuse experiment gate
+
+on:
+    pull_request:
+
+permissions:
+    contents: read
+    pull-requests: write # post/update the experiment result comment
+    actions: read # link the result to this job's logs
+
+jobs:
+    experiment:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: "3.12"
+
+            - name: Install app dependencies
+              run: pip install -r requirements.txt
+
+            - uses: langfuse/experiment-action@v1.0.8
+              env:
+                  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+              with:
+                  langfuse_public_key: ${{ secrets.LANGFUSE_PUBLIC_KEY }}
+                  langfuse_secret_key: ${{ secrets.LANGFUSE_SECRET_KEY }}
+                  langfuse_base_url: ${{ vars.LANGFUSE_HOST }}
+                  experiment_path: tests/run_evals.py
+                  dataset_name: meridian-golden-v1
+                  # meridian-golden-v1 is frozen by convention — promoted production
+                  # failures land in meridian-golden-candidates, never here — so the
+                  # latest version the action fetches is always the same 22 items.
+                  # requirements.txt already pins langfuse==4.14.1 — don't let the
+                  # action overwrite it with latest:
+                  should_skip_sdk_installation: true
+                  github_token: ${{ github.token }}
+                  # defaults: should_fail_on_regression=true, should_comment_on_pr=true
