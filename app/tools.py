@@ -1,10 +1,5 @@
-"""In-process tools (the specialists' hands): the account specialist's lookups and
-the policy retriever.
-
-The two service-desk tools (create_ticket / get_ticket_status) are NOT here —
-they run behind the MCP server in app/mcp.py and the agent discovers them over
-stdio at deploy time (see app/agent.py).
-"""
+"""Tools (the specialists' hands): account lookups, the policy retriever, and the
+service-desk ticket tools."""
 import json
 import math
 import random
@@ -14,9 +9,10 @@ from collections import Counter
 from datetime import datetime, timedelta
 
 from langchain.tools import tool
+from pydantic import ValidationError
 
 from app.config import get_lf
-from app.mcp import CUSTOMERS, LOANS, POLICY_KB
+from app.db import CUSTOMERS, LOANS, POLICY_KB, TICKETS, TicketRequest
 
 FLAKY_MODE = {"on": False, "fail_rate": 0.6}   # module 4 flips this on for the timeout/retry demo
 _flaky_rng = random.Random(7)
@@ -109,6 +105,28 @@ def get_emi_schedule(loan_id: str) -> str:
 
 
 @tool
+def create_ticket(customer_id: str, category: str, description: str) -> str:
+    """Raise a service ticket. category must be one of: statement_request, address_change, complaint,
+    prepayment_request, other. description must be at least 15 characters."""
+    try:
+        req = TicketRequest(customer_id=customer_id, category=category, description=description)
+    except ValidationError as e:
+        return f"ERROR: invalid ticket request: {e.errors()[0]['msg']} (field: {e.errors()[0]['loc']})"
+    tid = f"TKT-2026-{500 + len(TICKETS):04d}"   # id derived from the table — no counter state
+    TICKETS[tid] = {**req.model_dump(), "status": "open", "created": "2026-07-20", "owner": "L1-support"}
+    return json.dumps({"ticket_id": tid, "status": "open", "sla": "acknowledged in 48h, resolution target 7 days"})
+
+
+@tool
+def get_ticket_status(ticket_id: str) -> str:
+    """Check the status of an existing service ticket by its TKT- id."""
+    t = TICKETS.get(ticket_id)
+    if not t:
+        return f"ERROR: no ticket {ticket_id}"
+    return json.dumps({"ticket_id": ticket_id, **t})
+
+
+@tool
 def search_policy_kb(query: str) -> str:
     """Search Meridian's policy knowledge base. Returns the top-3 policy clauses for the query."""
     # We wrap the retrieval in a dedicated 'retriever' observation so retrievals are
@@ -124,3 +142,4 @@ def search_policy_kb(query: str) -> str:
 
 ACCOUNT_TOOLS = [get_customer, get_loan_summary, get_emi_schedule]
 POLICY_TOOLS = [search_policy_kb]
+SERVICE_TOOLS = [create_ticket, get_ticket_status]

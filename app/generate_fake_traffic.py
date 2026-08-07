@@ -1,14 +1,11 @@
-"""Simulated production traffic (Module 7.1): concurrent "users", sessions, feedback.
-
-Port of the notebook cell, with asyncio concurrency instead of threads — the
-MCP-backed service tools and the agent graph must run on one event loop.
+"""Simulated production traffic (Module 7.1): threaded "users", sessions, feedback.
 
 Run standalone from the repo root:
     python -m app.generate_fake_traffic --sessions 6 --version v2
 """
 import argparse
-import asyncio
 import random
+import threading
 import time
 from datetime import datetime, timezone
 
@@ -58,43 +55,53 @@ def _simulate_feedback(answer: str, hints):
     return _traffic_rng.random() < p_up
 
 
-async def generate_traffic(n_sessions: int, deploy_version: str, tag: str = "sim-traffic",
-                           concurrency: int = 3):
-    """Concurrent 'users' — same shape as the notebook's threaded version."""
+def generate_traffic(n_sessions: int, deploy_version: str, tag: str = "sim-traffic"):
+    """Threaded 'users' (sync run_agent per thread - simple & notebook-safe)."""
     from langchain_core.messages import AIMessage, HumanMessage
+    jobs = list(range(n_sessions)); lock = threading.Lock(); batch = []
 
-    start_ts = time.time()
-    if TRAFFIC_STARTED_AT["t"] is None:
-        TRAFFIC_STARTED_AT["t"] = datetime.now(timezone.utc)
-    sem = asyncio.Semaphore(concurrency)
-    batch = []
-
-    async def one_session(i):
+    def one_session(i):
         cid, _name = PERSONAS[i % len(PERSONAS)]
         q, hints, kind = PROD_QUESTIONS[i % len(PROD_QUESTIONS)]
         sid = f"prod-{deploy_version}-{int(start_ts)}-{i:03d}"
         record = {"session_id": sid, "customer_id": cid, "turns": [], "deploy": deploy_version}
         history = []
         turns = [q] + ([FOLLOWUPS.get(kind)] if _traffic_rng.random() < 0.35 else [])
-        async with sem:
-            for t, question in enumerate(turns):
-                req_id = f"{sid}-t{t}"
-                out = await run_agent(question, cid, user_id=cid, session_id=sid,
-                                      tags=[tag, f"deploy:{deploy_version}"], environment="production",
-                                      version=deploy_version, trace_seed=req_id, history=history)
-                history += [HumanMessage(content=question), AIMessage(content=out["answer"])]
-                record["turns"].append({"q": question, "a": out["answer"], "trace_id": out["trace_id"],
-                                        "request_id": req_id, "hints": hints,
-                                        "tools": [x["name"] for x in out["tool_calls"]]})
-            # simulate user thumbs up feedback
-            fb = _simulate_feedback(record["turns"][0]["a"], record["turns"][0]["hints"])
-            if fb is not None:
-                record_feedback(record["turns"][0]["request_id"], thumbs_up=fb,
-                                comment="(simulated end-user feedback)", environment="production")
-                record["feedback"] = int(fb)
-        batch.append(record)
+        for t, question in enumerate(turns):
+            req_id = f"{sid}-t{t}"
+            out = run_agent(question, cid, user_id=cid, session_id=sid,
+                            tags=[tag, f"deploy:{deploy_version}"], environment="production",
+                            version=deploy_version, trace_seed=req_id, history=history)
+            history += [HumanMessage(content=question), AIMessage(content=out["answer"])]
+            record["turns"].append({"q": question, "a": out["answer"], "trace_id": out["trace_id"],
+                                    "request_id": req_id, "hints": hints,
+                                    "tools": [x["name"] for x in out["tool_calls"]]})
+        # simulate user thumbs up feedback
+        fb = _simulate_feedback(record["turns"][0]["a"], record["turns"][0]["hints"])
+        if fb is not None:
+            record_feedback(record["turns"][0]["request_id"], thumbs_up=fb,
+                            comment="(simulated end-user feedback)", environment="production")
+            record["feedback"] = int(fb)
+        with lock:
+            batch.append(record)
 
-    await asyncio.gather(*(one_session(i) for i in range(n_sessions)))
+    start_ts = time.time()
+    if TRAFFIC_STARTED_AT["t"] is None:
+        TRAFFIC_STARTED_AT["t"] = datetime.now(timezone.utc)
+    threads = []
+
+    def worker():
+        while True:
+            with lock:
+                if not jobs:
+                    return
+                i = jobs.pop()
+            one_session(i)
+
+    for _ in range(3):
+        t = threading.Thread(target=worker, daemon=True); t.start(); threads.append(t)
+    for t in threads:
+        t.join()
     get_lf().flush()
     SESSION_LOG.extend(batch)
     ups = [r.get("feedback") for r in batch if "feedback" in r]
@@ -109,7 +116,7 @@ def main():
     ap.add_argument("--version", default="v2", help="deploy version tag on the traces")
     ap.add_argument("--tag", default="sim-traffic")
     args = ap.parse_args()
-    asyncio.run(generate_traffic(args.sessions, deploy_version=args.version, tag=args.tag))
+    generate_traffic(args.sessions, deploy_version=args.version, tag=args.tag)
 
 
 if __name__ == "__main__":

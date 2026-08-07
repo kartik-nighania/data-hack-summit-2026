@@ -8,7 +8,7 @@ import re
 from langfuse import Evaluation
 from pydantic import ValidationError
 
-from app.mcp import CUSTOMERS, TicketRequest
+from app.db import CUSTOMERS, TicketRequest
 
 
 def _norm(text: str) -> str:

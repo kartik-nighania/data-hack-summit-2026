@@ -7,8 +7,7 @@ the live demo.
 
 The running example is the **Meridian Housing Finance support agent**: a LangGraph
 supervisor routing between account / policy / service specialist agents over a mock
-loan-servicing world, fully instrumented with Langfuse. The two service-desk tools run
-behind an MCP server (FastMCP, stdio) that the agent discovers at deploy time.
+loan-servicing world, fully instrumented with Langfuse.
 
 ## Repo map
 
@@ -18,9 +17,9 @@ behind an MCP server (FastMCP, stdio) that the agent discovers at deploy time.
 | `workshop/agentOps_workshop.ipynb` | The original 91-cell monolith — kept as the teaching-content reference until the split notebooks are battle-tested |
 | `app/config.py` | config.yaml constants + `load_keys()` (notebook paste-cell/env vars → .env → getpass; "..." placeholders ignored) + `get_lf()` (client with masking hook). **No network at import anywhere in app/** |
 | `app/pii_data_masking.py` | `PII_PATTERNS` list + export-time masking hook; empty list = no-op |
-| `app/mcp.py` | Mock world (loads `data/*.json`) + the service-desk MCP server. Run as `python -m app.mcp` — never `python app/mcp.py` (would shadow the real `mcp` package) |
-| `app/tools.py` | Account/policy tools, TF-IDF retriever, `FLAKY_MODE` retry demo (Module 4) |
-| `app/agent.py` | Graph + `deploy_agent()`/`get_agent()`/`redeploy_agent()`, async `ainvoke_agent()`/`run_agent()`, `SABOTAGE_BREVITY` + `set_sabotage()`. **Agent is async-only** (MCP tools); notebooks use top-level `await` |
+| `app/db.py` | Mock world (loads `data/*.json`): CUSTOMERS, LOANS, TICKETS, POLICY_KB + `TicketRequest` schema |
+| `app/tools.py` | All agent tools (account / policy retriever / service desk), TF-IDF retriever, `FLAKY_MODE` retry demo (Module 4); ticket ids derive from the table (no counter) |
+| `app/agent.py` | Graph + `deploy_agent()`/`get_agent()`/`redeploy_agent()`, sync `invoke_agent()`/`run_agent()` (notebook path) + async `ainvoke_agent()` (experiments/gate), `SABOTAGE_BREVITY` + `set_sabotage()` |
 | `app/prompts.py` | v1 prompt texts + idempotent `ensure_prompt()`/`seed_prompts()` |
 | `app/golden.py` | `GOLDEN_ITEMS` (from `data/golden_items.json`) + idempotent `seed_dataset()` + `ensure_candidates_dataset()` |
 | `app/evaluators.py` | The 5 rule evaluators + `make_run_evaluator()` — shared by notebook 03 and the CI gate |
@@ -36,8 +35,8 @@ behind an MCP server (FastMCP, stdio) that the agent discovers at deploy time.
   mirror, not memory — the repo pins specific versions and both products move fast.
 - **Pinned stack — do not bump casually.** Pins live only in `requirements.txt` now
   (notebooks install from it). Core: `langfuse==4.14.1 · langchain==1.3.14 · langgraph==1.2.9 ·
-  langchain-openai==1.3.5 · deepeval==4.1.1 · openai==2.46.0 · fastmcp==3.4.6 ·
-  langchain-mcp-adapters==0.3.2`. Models: agent `gpt-4o-mini`, judges `gpt-4.1-mini`.
+  langchain-openai==1.3.5 · deepeval==4.1.1 · openai==2.46.0`. Models: agent
+  `gpt-4o-mini`, judges `gpt-4.1-mini`.
 - **Sync rule:** notebook 00/03 cells teach by importing from `app/` with the original header
   comments; the monolith still has everything inline. If you change agent/evaluator/prompt
   behaviour, update `app/` (the source of truth) and check the corresponding notebook
@@ -65,7 +64,6 @@ behind an MCP server (FastMCP, stdio) that the agent discovers at deploy time.
 ```bash
 .venv/bin/python -m pip install -r requirements.txt        # full pinned stack
 python -m py_compile app/*.py tests/run_evals.py           # quick syntax check
-python -m app.mcp                                          # run the MCP server standalone (stdio)
 python -m app.generate_fake_traffic --sessions 6 --version v2   # simulated prod traffic
 python tests/run_evals.py [run_name]                       # the merge gate, locally (exit 1 on regression)
 ```
@@ -76,8 +74,8 @@ project — don't run them speculatively.
 
 ## Course structure (six notebooks · 4 h)
 
-- **00 · Setup & the agent (M0–2, 45 m)** — keys/connection check; mock world, tools (service
-  desk via MCP), v1 prompts, the graph; first traces; PII masking at export time
+- **00 · Setup & the agent (M0–2, 45 m)** — keys/connection check; mock world, the
+  specialists' tools, v1 prompts, the graph; first traces; PII masking at export time
 - **01 · Prompt versioning (M3, 15 m)** — labels, staging→promote→rollback, fallbacks
 - **02 · Tracing & feedback (M4–5, 40 m)** — trace anatomy, sessions/users/tags, the
   FLAKY_MODE timeout-retry demo; user feedback as scores (trace id derived from request id)
