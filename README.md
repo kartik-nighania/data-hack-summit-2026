@@ -15,7 +15,7 @@ fully monitored, production-ready system.
 
 The running example is the **Meridian Housing Finance support agent**: a **LangGraph**
 supervisor routing between account, policy, and service specialists over a mock
-loan-servicing world, fully instrumented with **Langfuse**.
+loan-servicing world, fully instrumented with **Langfuse**. 
 
 ```
 https://pastebin.com/Xv6LPLDL
