@@ -1,12 +1,21 @@
-# Monitoring & Evaluating Agentic AI in Production with Langfuse
+# AgentOps: Full Production Lifecycle - Build, Deploy, Scale & Monitor
 
-A hands-on workshop: build a multi-agent support desk with **LangGraph**, then wrap the full
-production loop around it with **Langfuse** — tracing → prompt management → user feedback →
-evaluation (rules, LLM-as-a-Judge, **DeepEval**) → online evals → dashboards →
-monitoring/alerting → a CI/CD quality gate that blocks bad merges.
+In this hands-on workshop, participants will learn how to build, deploy, scale, and monitor
+multi-agent workflows exactly the way it's done in a production environment at scale.
 
-The running example is the **Meridian Housing Finance support agent**: a supervisor routing
-between account, policy, and service specialists over a mock loan-servicing world.
+We'll cover agent architecture fundamentals like multi-agent systems, MCP, context engineering
+and then build real-world agents with tool calling, RAG, memory, and human-in-the-loop
+workflows.
+
+The workshop goes beyond development, covering evaluation strategies, CI/CD integration,
+prompt versioning, cloud scaling, and production monitoring and alerting.
+
+By the end, attendees will have the skills to take an AI agent from a local prototype to a
+fully monitored, production-ready system.
+
+The running example is the **Meridian Housing Finance support agent**: a **LangGraph**
+supervisor routing between account, policy, and service specialists over a mock
+loan-servicing world, fully instrumented with **Langfuse**.
 
 ## Notebooks
 
